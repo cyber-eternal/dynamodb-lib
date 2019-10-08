@@ -60,6 +60,7 @@ var getItemByGSI = ({
   filter && filterValue && operator && filter1 && filterValue1 ? (params.FilterExpression += ` ${operator} #${filter1} = :${filter1}`) &&
     (params.ExpressionAttributeNames[`#${filter1}`] = filter1) &&
     (params.ExpressionAttributeValues[`:${filter1}`] = filterValue1) : '';
+  params = _.omitBy(params, _.isNil)
   return call('query', params);
 };
 
