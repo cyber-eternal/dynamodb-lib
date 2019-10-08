@@ -1,3 +1,3 @@
 # dynamodb-lib
 
-Coming Soon
+Library  to simplify working with Dynamodb
