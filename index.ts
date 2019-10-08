@@ -100,7 +100,7 @@ var updateInDB = ({ TableName, Key, updatedData }) => {
   return new Promise(async (resolve, reject) => {
     try {
       console.log('updatedData', updatedData);
-      const params = {
+      var params = {
         TableName: `${TableName}-${stage}`,
         Key,
         UpdateExpression: 'SET #updatedAt = :updatedAt',
@@ -111,18 +111,14 @@ var updateInDB = ({ TableName, Key, updatedData }) => {
           '#updatedAt': 'updatedAt'
         },
       };
-      _.forEach(updatedData, (item, key) => {
+      _.forEach(updatedData, (item: any, key: any) => {
         if (key !== 'id' && key !== 'provider') {
-          console.log('item', item);
-          console.log('key', key);
           if (typeof item === 'string') {
             params.UpdateExpression += `, #${key} = :${key}`;
             params.ExpressionAttributeValues[`:${key}`] = item;
             params.ExpressionAttributeNames[`#${key}`] = key;
           } else if (typeof item === 'object' && Object.keys(item).length > 0) {
-            _.forEach(item, (item1, key2) => {
-              console.log('item1', item1);
-              console.log('key2', key2);
+            _.forEach(item, (item1: any, key2: any) => {
               params.UpdateExpression += `, ${key}.#${key2} = :${key2}`;
               params.ExpressionAttributeValues[`:${key2}`] = item1;
               params.ExpressionAttributeNames[`#${key2}`] = key2;
@@ -130,49 +126,49 @@ var updateInDB = ({ TableName, Key, updatedData }) => {
           }
         }
       });
-
-      console.log('params', params);
-      await dynamoDbLib.call('update', params);
-      console.log('Attributes successfully updated');
-      resolve('success');
+      await call('update', params);
+      resolve('Success');
     } catch (error) {
-      console.log('ERROR in updateInDB', error);
       reject(error);
     }
   });
 };
 
-var deleteAttributes = ({ TableName, Key, attributesList }) => {
-  return new Promise(async (resolve, reject) => {
-    try {
-      let params = {
-        TableName: `${TableName}-${stage}`,
-        Key,
-      };
-      if (attributesList.length) {
-        params.UpdateExpression = '';
-        params.ExpressionAttributeNames = {};
-        let isFirst = true;
-        for (const attribute of attributesList) {
-          attribute !== attributesList[0] ? isFirst = false : '';
-          params.UpdateExpression += isFirst ? `#${attribute}` : `,#${attribute}`;
-          params.ExpressionAttributeNames[`#${attribute}`] = attribute;
-        }
-        console.log('params', params);
-        await dynamoDbLib.call('update', params);
-        console.log('Attributes successfully removed');
-        resolve('Attributes successfully removed');
-      } else {
-        console.log('Nothing to remove');
-        resolve('Nothing to remove');
-      }
-    } catch (error) {
-      console.log('ERROR in deleteAttributes', error);
-      reject(error);
-    }
-  });
-};
+// var deleteAttributes = ({ TableName, Key, attributesList }) => {
+//   return new Promise(async (resolve, reject) => {
+//     try {
+//       let params = {
+//         TableName: `${TableName}-${stage}`,
+//         Key,
+//       };
+//       if (attributesList.length) {
+//         params.UpdateExpression = '';
+//         params.ExpressionAttributeNames = {};
+//         let isFirst = true;
+//         for (const attribute of attributesList) {
+//           attribute !== attributesList[0] ? isFirst = false : '';
+//           params.UpdateExpression += isFirst ? `#${attribute}` : `,#${attribute}`;
+//           params.ExpressionAttributeNames[`#${attribute}`] = attribute;
+//         }
+//         console.log('params', params);
+//         await dynamoDbLib.call('update', params);
+//         console.log('Attributes successfully removed');
+//         resolve('Attributes successfully removed');
+//       } else {
+//         console.log('Nothing to remove');
+//         resolve('Nothing to remove');
+//       }
+//     } catch (error) {
+//       console.log('ERROR in deleteAttributes', error);
+//       reject(error);
+//     }
+//   });
+// };
 
 module.exports = {
-  config
+  config,
+  getItemByGSI,
+  getAllItemsByGSI,
+  updateInDB,
+  writeDataIntoDB
 };
