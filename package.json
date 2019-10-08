@@ -2,7 +2,7 @@
   "name": "dynamodb-lib",
   "version": "1.0.0",
   "description": "Library  to simplify working with Dynamodb",
-  "main": "index.js",
+  "main": "index.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
