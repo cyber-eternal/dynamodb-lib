@@ -75,8 +75,8 @@ import {
 ```node
 await getItemByGSI({
       TableName : 'Example',
-      IndexName: 'favorit-createdAt-index',
-      attribute: 'favorit',
+      IndexName: 'favorite-createdAt-index',
+      attribute: 'favorite',
       value: 'true',
       ScanIndexForward: false,
       Limit: 50
