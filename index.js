@@ -41,7 +41,6 @@ var getItemByGSI = ({
         KeyConditionExpression: '#attrKey = :attrValue',
         ExpressionAttributeValues: { ':attrValue': value },
         ExpressionAttributeNames: { '#attrKey': attribute },
-        ScanIndexForward,
         ExclusiveStartKey: LastEvaluatedKey,
         Limit,
         FilterExpression: null
@@ -56,6 +55,7 @@ var getItemByGSI = ({
         (params.ExpressionAttributeNames[`#${filter1}`] = filter1) &&
         (params.ExpressionAttributeValues[`:${filter1}`] = filterValue1) : '';
       params = omitBy(params, isNil);
+      if (ScanIndexForward === false) params.ScanIndexForward = ScanIndexForward;
       var result = await call('query', params);
       resolve(result);
     } catch (error) {
