@@ -178,7 +178,7 @@ var removeAttributes = ({ TableName, Key, attributesList }) => {
   });
 };
 
-const deleteItem = ({ TableName, Key }) => {
+var deleteItem = ({ TableName, Key }) => {
   return new Promise(async (resolve, reject) => {
     try {
       var params = {
@@ -187,6 +187,19 @@ const deleteItem = ({ TableName, Key }) => {
       };
       await call('delete', params);
       resolve(`Item ${JSON.stringify(Key)} from ${TableName} successfully deleted`)
+    } catch (e) {
+      reject(e);
+    }
+  });
+};
+
+var deleteItems = ({ TableName, Keys }) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      for (var x of Keys) {
+        await deleteItem({ TableName, Key: x });
+      }
+      resolve(`Items successfully deleted`)
     } catch (e) {
       reject(e);
     }
