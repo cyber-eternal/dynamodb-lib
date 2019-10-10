@@ -82,22 +82,6 @@ var writeDataIntoDB = (TableName, Item) => {
 var getAllItemsByGSI = (data) => {
   return new Promise(async (resolve, reject) => {
     try {
-      // {
-      //   TableName,
-      //   IndexName,
-      //   attribute,
-      //   value,
-      //   sortKey,
-      //   sortValue,
-      //   filter,
-      //   filterValue,
-      //   operator,
-      //   filter1,
-      //   filterValue1,
-      //   LastEvaluatedKey,
-      //   ScanIndexForward,
-      //   Limit
-      // }
       var finalData = [];
       var gettingData = await getItemByGSI(data);
       finalData = finalData.concat(gettingData.Items);
@@ -119,27 +103,25 @@ var updateInDB = ({ TableName, Key, updatedData }) => {
       var params = {
         TableName: `${TableName}-${stage}`,
         Key,
-        UpdateExpression: 'SET #updatedAt = :updatedAt',
-        ExpressionAttributeValues: {
-          ':updatedAt': Date.now()
-        },
-        ExpressionAttributeNames: {
-          '#updatedAt': 'updatedAt'
-        },
+        UpdateExpression: '',
+        ExpressionAttributeValues: {},
+        ExpressionAttributeNames: {},
       };
       forEach(updatedData, (item, key) => {
-        if (key !== 'id' && key !== 'provider') {
-          if (typeof item === 'string') {
-            params.UpdateExpression += `, #${key} = :${key}`;
-            params.ExpressionAttributeValues[`:${key}`] = item;
-            params.ExpressionAttributeNames[`#${key}`] = key;
-          } else if (typeof item === 'object' && Object.keys(item).length > 0) {
-            forEach(item, (item1, key2) => {
-              params.UpdateExpression += `, ${key}.#${key2} = :${key2}`;
-              params.ExpressionAttributeValues[`:${key2}`] = item1;
-              params.ExpressionAttributeNames[`#${key2}`] = key2;
-            });
-          }
+        const beginString = !UpdateExpression ? 'SET ' : '';
+        const hasNext = (updatedData[key + 1] || updatedData[key + 1] === false) ? ', ' : '';
+        if ((typeof item === 'string') || (typeof item === 'number') || (typeof item === 'boolean')) {
+          params.UpdateExpression += (beginString + hasNext + `#${key} = :${key}`);
+          params.ExpressionAttributeValues[`:${key}`] = item;
+          params.ExpressionAttributeNames[`#${key}`] = key;
+        } else if (typeof item === 'object' && Object.keys(item).length > 0) {
+          forEach(item, (item1, key2) => {
+            params.UpdateExpression += (beginString + hasNext + `${key}.#${key2} = :${key2}`);
+            params.ExpressionAttributeValues[`:${key2}`] = item1;
+            params.ExpressionAttributeNames[`#${key2}`] = key2;
+          });
+        } else{
+          throw new Error(`Item ${item} with key ${key} can't be updated`);
         }
       });
       await call('update', params);
@@ -150,33 +132,33 @@ var updateInDB = ({ TableName, Key, updatedData }) => {
   });
 };
 
-var removeAttributes = ({ TableName, Key, attributesList }) => {
-  return new Promise(async (resolve, reject) => {
-    try {
-      let params = {
-        TableName: `${TableName}-${stage}`,
-        Key,
-      };
-      if (attributesList.length) {
-        params.UpdateExpression = 'REMOVE ';
-        params.ExpressionAttributeNames = {};
-        for (const attribute of attributesList) {
-          var hasNext = attributesList[attributesList.indexOf(attribute) + 1] ? true : false
-          params.UpdateExpression += hasNext ? `#${attribute}` : `, #${attribute}`;
-          params.ExpressionAttributeNames[`#${attribute}`] = attribute;
-        }
-        await dynamoDbLib.call('update', params);
-        resolve('Attributes successfully removed');
-      } else {
-        console.log('Nothing to remove');
-        resolve('Nothing to remove');
-      }
-    } catch (error) {
-      console.log('ERROR in deleteAttributes', error);
-      reject(error);
-    }
-  });
-};
+// var removeAttributes = ({ TableName, Key, attributesList }) => {
+//   return new Promise(async (resolve, reject) => {
+//     try {
+//       let params = {
+//         TableName: `${TableName}-${stage}`,
+//         Key,
+//       };
+//       if (attributesList.length) {
+//         params.UpdateExpression = 'REMOVE ';
+//         params.ExpressionAttributeNames = {};
+//         for (const attribute of attributesList) {
+//           var hasNext = attributesList[attributesList.indexOf(attribute) + 1] ? true : false
+//           params.UpdateExpression += hasNext ? `#${attribute}` : `, #${attribute}`;
+//           params.ExpressionAttributeNames[`#${attribute}`] = attribute;
+//         }
+//         await dynamoDbLib.call('update', params);
+//         resolve('Attributes successfully removed');
+//       } else {
+//         console.log('Nothing to remove');
+//         resolve('Nothing to remove');
+//       }
+//     } catch (error) {
+//       console.log('ERROR in deleteAttributes', error);
+//       reject(error);
+//     }
+//   });
+// };
 
 var deleteItem = ({ TableName, Key }) => {
   return new Promise(async (resolve, reject) => {
