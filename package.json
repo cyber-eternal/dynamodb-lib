@@ -1,8 +1,11 @@
 {
-  "name": "dynamodb-lib",
+  "name": "@cyber-eternal/dynamodb-lib",
   "version": "1.0.6",
   "description": "Library  to simplify working with Dynamodb",
   "main": "index.js",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
