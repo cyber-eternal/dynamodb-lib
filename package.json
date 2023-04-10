@@ -25,7 +25,7 @@
   },
   "homepage": "https://github.com/cyber-eternal/dynamodb-lib#readme",
   "dependencies": {
-    "aws-sdk": "^2.814.0",
+    "aws-sdk": "^2.1354.0",
     "lodash": "^4.17.21"
   }
 }
